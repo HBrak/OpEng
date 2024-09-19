@@ -10,7 +10,7 @@ get_new_folder_path() {
                         echo "$fileDir""/""$(date -r "$file" +%Y-%m)"
                         ;;
                 "week")
-                        echo "fileDir""/""$(date -r "$file" +%Y-week-%V)"
+                        echo "$fileDir""/""$(date -r "$file" +%Y-week-%V)"
                         ;;
                 *)
                 echo "invalid parameter: $2 (use 'maand', 'month', 'week')"
@@ -37,7 +37,7 @@ move_file() {
                 
         else
                 echo "failed to move file"
-                return 1
+                exit 1
         fi
 }
 
@@ -56,11 +56,11 @@ if [ -d "$directory" ]; then
                 newPath=$(get_new_folder_path "$file" "$when")
                 if [ $? -eq 0 ]; then
                         echo $newPath
-                        return 1
+                        exit 1
                 echoRes=$(move_file "$file" "$newPath")
                 if [ $? -eq 0 ]; then
                         echo $echoRes
-                        return 1
+                        exit 1
         done
         echo "moved all images"
 else
