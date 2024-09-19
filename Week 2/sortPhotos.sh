@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#get folder path for file
+#function get folder path for file
 get_new_folder_path() {
         file=$1
         when=$2
@@ -19,7 +19,7 @@ get_new_folder_path() {
         esac
 }
 
-#move file to desired path
+#function move file to desired path
 move_file() {
         file=$1
         path=$2
@@ -28,20 +28,20 @@ move_file() {
         cp "$file" "$path"
         newFile="$path/$(basename "$file")"
 
-        echo "copied "$file" to "$path""
-
         hash_orig=$(md5sum "$file" | awk '{print $1}')
         hash_new=$(md5sum "$newFile" | awk '{print $1}')
 
         if [ "$hash_orig" == "$hash_new" ]; then
+                echo "copy validated, copied "$file" to "$path", removing original"
                 rm "$file"
-                echo "copy validated, removing original"
+                
         else
                 echo "failed to move file"
-                exit 1
+                return 1
         fi
 }
 
+#main of script
 directory=$1
 when=$2
 if [ -d "$directory" ]; then
@@ -52,8 +52,15 @@ if [ -d "$directory" ]; then
                         echo "skipping "$file", is not a known image format"
                         continue
                 fi
+
                 newPath=$(get_new_folder_path "$file" "$when")
-                move_file "$file" "$newPath"
+                if [ $? -eq 0 ]; then
+                        echo $newPath
+                        return 1
+                echoRes=$(move_file "$file" "$newPath")
+                if [ $? -eq 0 ]; then
+                        echo $echoRes
+                        return 1
         done
         echo "moved all images"
 else
